@@ -10,4 +10,8 @@ New features:
   
   smooth_move_right(timeout) - smoothly moves camera to the right with speed up and slow down, continuously till timeout is reached
   
-This repo works with camera .52!
+  speed_up(interval, steps, direction) - Increases velocity with selected interval in selected amount of steps to the selected direction
+  
+  slowdown(interval, steps, direction) - Decreases velocity with selected interval in selected amount of steps to the selected direction.
+  
+This repo works with camera .52 by default!
