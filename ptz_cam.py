@@ -128,27 +128,6 @@ class ptzcam():
             sleep(.100)
         self.stop()
 
-    def smooth_move(self, timeout):
-        from time import sleep
-        if timeout < 2:
-            print 'Timeout should be at least 2 seconds'
-        print 'Moving to the left smoothly...'
-        velocity = 0.0
-        self.requestc.Velocity.PanTilt._y = 0.0
-        #Speeding up
-        for x in range(0, 10):
-            self.requestc.Velocity.PanTilt._x = (velocity + 0.1*x)
-            self.ptz.ContinuousMove(self.requestc)
-            sleep(.100)
-        velocity = 1.0
-        self.perform_move(timeout-2)
-        #Slowing down
-        for x in range(0, 10):
-            self.requestc.Velocity.PanTilt._x = (velocity - 0.1*x)
-            self.ptz.ContinuousMove(self.requestc)
-            sleep(.100)
-        self.stop()
-
     def speed_up(interval, steps, direction):
         for x in range(0, steps):
             self.requestc.Velocity.PanTilt._x = (velocity + 0.1*x*direction)
