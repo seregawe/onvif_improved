@@ -1,3 +1,4 @@
+#PLEASE GO THE LINE 93
 from time import sleep
 class ptzcam():
     def __init__(self):
@@ -88,6 +89,51 @@ class ptzcam():
         print
         self.ptz.Stop(self.requests)
         print 'Stopped'
+
+#Move to the point
+def smooth_move(self, pan, tilt):
+        #Approximation setting
+        delta = 0.01
+        #Arguments check
+        if abs(pan) > 1 or abs(tilt) > 1:
+            print 'Pan/Tilt value should be in range of [-1.0, 1.0]'
+            return
+        print 'Starting to move smoothly..'
+        #Zeroing velocity
+        velocity = 0.0
+        self.requestc.Velocity.PanTilt._x = 0.0
+        self.requestc.Velocity.PanTilt._y = 0.0
+        #Getting current position
+        token = self.media_profile._token
+        status = self.ptz.GetStatus({'ProfileToken':token})
+        print 'Pan position:', status.Position.PanTilt._x
+        print 'Tilt position:', status.Position.PanTilt._y
+        #Starting do loop with approximation
+        while abs(pan - status.Position.PanTilt._x) < delta and abs(tilt - status.Position.PanTilt._y) < delta:
+            #If desired point is bigger than cuurent position, then axis speed should be positive, overwise - negative
+            if pan > status.Position.PanTilt._x:
+                self.requestc.Velocity.PanTilt._x = velocity
+            else:
+                self.requestc.Velocity.PanTilt._x = -1*velocity
+            #The same logic for tilt
+            if tilt > status.Position.PanTilt._y:
+                self.requestc.Velocity.PanTilt._y = velocity
+            else:
+                self.requestc.Velocity.PanTilt._y = -1*velocity
+            #In case the approximation reached zeroing axis speed
+            if abs(pan - status.Position.PanTilt._x) < delta:
+                self.requestc.Velocity.PanTilt._x = 0
+            #In case the approximation reached zeroing axis speed
+            if abs(tilt - status.Position.PanTilt._y) < delta:
+                self.requestc.Velocity.PanTilt._y = 0
+            #Performing continious move
+            self.ptz.ContinuousMove(self.requestc)
+            #Velocity speeds up increasingly
+            velocity = velocity + 0.05
+            #Getting new status value for the next iteration
+            status = self.ptz.GetStatus({'ProfileToken':token})
+            #Waiting 50 ms before changing velocity
+            sleep(.050)
 
 #Continuous move functions
     def perform_move(self, timeout):
